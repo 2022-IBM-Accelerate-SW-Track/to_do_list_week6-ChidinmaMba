@@ -1,39 +1,43 @@
 import React from "react";
 import "../component/todos.css";
-import {  Card, Grid, ListItemButton, ListItemText, Checkbox } from "@mui/material";
+import {Card,CardContent,Grid,ListItemButton,ListItemText,Checkbox} from "@mui/material";
 
-
+// 1. This component formats and returns the list of todos.
+// 2. Treat the question mark like an if statement.
+// If the todos array has items in the list [todos.length], we want to return the list
+// Else, return a message saying "You have no todo's left"
+// 3. The map function is called to assign each array item with a key
+// 4. Think of lines 14-23 as a loop. For each todo in the todo list, we want to give the list item
+// a key, and it's own card shown in the UI
 const Todos = ({ todos, deleteTodo }) => {
-  console.log(todos);
-  const todoList = todos.length ? (
-    todos.map((todo) => {
-      let color = '#fffffff'
-      if (new Date() > new Date(todo.due)){
-        color = '#d9b60bf7'
-      }
-      return (
-        <Grid key={todo.id} container spacing={2}>
-          <Card data-testid={todo.content} style={{marginTop:10, background: color}}>
-          
-            <ListItemButton component="a" href="#simple-list">
-              <Checkbox style={{paddingLeft:0}} color="primary" onClick={() => deleteTodo(todo.id)}/>
-              <ListItemText primary={todo.content} secondary={todo.due}/>
-            </ListItemButton>
-          </Card>
-        </Grid>
-      );
-    })
-  ) : (
-    <p>You have no todo's left </p>
-  );
-
-  return (
-    <div className="todoCollection" style={{ padding: "10px" }}>
-      {todoList}
-    </div>
-  );
-
-
+    const todoList = todos.length ? (
+      todos.map((todo) => {
+        let color = () => {
+          if(new Date(todo.due) < new Date()){
+            return "red"
+          }
+          return "white"
+        }
+        return (
+          <Grid key={todo.id}>
+            <Card style={{ marginTop:10, background: color()}} data-testid={todo.content}>
+              <ListItemButton component="a" href="#simple-list">
+                <ListItemText primary={todo.content} secondary={todo.due}/>
+                <Checkbox style={{ paddingLeft:0 }} color="primary" onClick={() => deleteTodo(todo.id)}/>
+              </ListItemButton>
+            </Card>
+          </Grid>
+        );
+      })
+    ) : (
+      <p>You have no todo's left</p>
+    );
+    // Lastly, return the todoList constant that we created above to show all of the items on the screen.
+    return (
+      <div className="todoCollection" style={{ padding: "10px" }}>
+        {todoList}
+      </div>
+    );
 };
-
+  
 export default Todos;

@@ -1,16 +1,37 @@
-import React, { Component } from "react";
-import Todos from "../component/todos";
-import AddTodo from "../component/AddTodo";
-import "../pages/Home.css";
-import Axios from "axios";
-
+import React, { Component } from 'react';
+import AddTodo from '../component/AddTodo';
+import Todos from "../component/todos.js";
+import "./Home.css";
+  
 class Home extends Component {
-
-  state = {
-    todos: [],
+  // A default state of this component with an empty list of todos.
+  constructor() {
+    super();
+    this.state = {
+      // create your empty list here call it todos.
+      todos: []
+    };
+  }
+  // the addTodo function simply creates a new array that includes the user submitted todo item and then
+  // updates the state with the new list.
+  addTodo = (todo) => {
+    // In React, keys or ids in a list help identify which items have changed, been added or removed. Keys
+    // should not share duplicate values.
+    // To avoid having dup values, we use the Math.random() function to generate a random value for a todo id.
+    // This solution works for a small application but a more complex hashing function should be used when
+    // dealing with a larger data sensitive project.
+    if (this.state.todos.map(x => x.content).includes(todo.content) || todo.due == null || todo.due == "Invalid Date"){
+      return;
+    } else{
+      todo.id = Math.random();
+      // An array that contains the current array and the new todo item
+      let new_list = [...this.state.todos, todo];
+      // Updates the local state with the new array.
+      this.setState({
+        todos: new_list,
+      });
+    }
   };
-    
-
   deleteTodo = (id) => {
     const todos = this.state.todos.filter((todo) => {
       return todo.id !== id;
@@ -19,51 +40,11 @@ class Home extends Component {
       todos: todos,
     });
   };
-
-  addTodo = (todo) => { 
-    const exists = this.state.todos.find(t => t.content === todo.content);
-    if (exists || todo.content.trim() == null || todo.content.trim() === '' || todo.due == null || todo.due === 'Invalid Date'){ return }
-    todo.id = Math.random();
-
-     // Send Task Item to database as a json object upon submission
-     const jsonObject = {
-      id: todo.id,
-      task: todo.content,
-      currentDate: todo.date,
-      dueDate: todo.duedate
-    };
-
-    Axios({
-      method: "POST",
-      url: "http://localhost:8080/items",
-      data: {jsonObject},
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }).then(res => {
-        console.log(res.data.message);
-    });
-
-    // Create a array that contains the current array and the new todo item
-    let new_list = [...this.state.todos, todo];
-    // Update the local state with the new array.
-    this.setState({
-      todos: new_list,
-    });
-  };
-
-  updateTodo = (id, newTodo) => {
-    if (newTodo.content.trim() === null || newTodo.content.trim() === ''){ return }
-    this.setState(prev => prev.map(item => (item.id === id ? newTodo : item)))
-  }
-   
-  render() {  
+  render() {
     return (
       <div className="Home">
-        <h1>Todo List </h1>
-        
-        <AddTodo addTodo={this.addTodo} />
-        <Todos todos={this.state.todos} deleteTodo={this.deleteTodo} updateTodo={this.updateTodo} />
+        <AddTodo addTodo={ this.addTodo } />
+        <Todos todos={ this.state.todos } deleteTodo={ this.deleteTodo } />
       </div>
     );
   }
